@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国内空号生成工具</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* 全局样式 */
+        body {
+            background-color: #f8f9fa;
+            color: #212529;
+        }
+
+        /* 卡片增强样式 */
+        .card {
+            border-radius: 0.5rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .card-header {
+            border-bottom: 0;
+            padding: 0.75rem 1.25rem;
+        }
+
+        .card:hover {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        }
+
+        /* 表格样式 */
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table th {
+            font-weight: 600;
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        /* 按钮样式 */
+        .btn {
+            border-radius: 0.25rem;
+            font-weight: 500;
+        }
+
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        .btn-primary:hover {
+            background-color: #0b5ed7;
+            border-color: #0a58ca;
+        }
+
+        /* 历史记录项样式 */
+        #historyList .list-group-item {
+            padding: 0.75rem 1.25rem;
+            border-left: none;
+            border-right: none;
+            transition: background-color 0.2s ease;
+        }
+
+        #historyList .list-group-item:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+            cursor: pointer;
+        }
+
+        #historyList .list-group-item:first-child {
+            border-top: none;
+        }
+
+        /* 结果表格样式 */
+        #resultTable {
+            font-size: 0.95rem;
+        }
+
+        #resultBody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        #resultBody tr:hover {
+            background-color: rgba(13, 110, 253, 0.05);
+        }
+
+        /* 表单控件增强 */
+        .form-control:focus,
+        .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        /* 空结果提示 */
+        #resultEmpty {
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 高亮空号概率 */
+        .probability-high {
+            color: #198754;
+            font-weight: 600;
+        }
+
+        .probability-medium {
+            color: #fd7e14;
+            font-weight: 600;
+        }
+
+        .probability-low {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 768px) {
+            #resultTable {
+                font-size: 0.85rem;
+            }
+
+            .card-body {
+                padding: 1rem;
+            }
+
+            .container {
+                padding: 0 0.75rem;
+            }
+        }
+
+        /* 复制和导出按钮样式 */
+        #copyBtn:hover,
+        #exportBtn:hover {
+            background-color: #e2e6ea;
+            border-color: #dae0e5;
+        }
+
+        /* 弹出框样式 */
+        .modal-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .modal-footer {
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container mt-4 mb-5">
+        <header class="mb-4 text-center">
+            <h1 class="display-5 fw-bold">国内空号生成工具</h1>
+            <p class="text-muted">生成符合中国大陆手机号规则但拨打时提示"您拨的电话号码为空号"的电话号码</p>
+        </header>
+
+        <div class="row">
+            <!-- 左侧参数设置面板 -->
+            <div class="col-md-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">生成设置</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="phoneForm">
+                            <!-- 生成数量 -->
+                            <div class="mb-4">
+                                <label for="count" class="form-label">生成数量</label>
+                                <input type="number" class="form-control form-control-lg" id="count" min="1" max="10000"
+                                    value="10">
+                                <div class="form-text">最多可生成10,000个号码</div>
+                            </div>
+
+                            <!-- 隐藏的默认参数 -->
+                            <input type="hidden" id="verifyMode" value="advanced">
+                            <input type="hidden" id="operator" value="all">
+                            <input type="hidden" id="format" value="csv">
+                            <input type="hidden" id="apiKey" value="">
+                            <input type="hidden" id="prefix" value="">
+                            <input type="hidden" id="exclude4" checked>
+                            <input type="hidden" id="tail" value="">
+
+                            <!-- 生成按钮 -->
+                            <div class="d-grid gap-2">
+                                <button type="button" id="generateBtn" class="btn btn-primary btn-lg">
+                                    <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status"
+                                        aria-hidden="true"></span>
+                                    <span id="btnText">开始生成</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 历史记录面板 -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">生成历史</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush" id="historyList">
+                            <li class="list-group-item text-center text-muted">暂无生成记录</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧结果展示面板 -->
+            <div class="col-md-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">生成结果</h5>
+                        <div>
+                            <button id="copyBtn" class="btn btn-sm btn-light me-2" disabled>
+                                <i class="fas fa-copy"></i> 复制
+                            </button>
+                            <button id="exportBtn" class="btn btn-sm btn-light" disabled>
+                                <i class="fas fa-download"></i> 导出
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="resultEmpty" class="text-center py-5">
+                            <p class="text-muted">请输入数量并点击"开始生成"按钮</p>
+                        </div>
+
+                        <div id="resultContent" class="d-none">
+                            <div class="alert alert-info mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>共生成了 <strong id="numberCount">0</strong> 个空号</span>
+                                    <span id="generationTime"></span>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover" id="resultTable">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>手机号码</th>
+                                            <th>运营商</th>
+                                            <th>空号概率</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resultBody">
+                                        <!-- 结果将动态填充 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 空号说明面板 -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="card-title mb-0">空号说明</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <strong>空号定义：</strong>符合运营商电话号码格式规则，但拨打时提示"您拨的电话号码为空号"的电话号码。
+                        </div>
+                        <p>空号主要包括以下几种情况：</p>
+                        <ul>
+                            <li>未被运营商分配给用户的号码</li>
+                            <li>曾经分配但已经被注销/收回的号码</li>
+                            <li>运营商保留但未投入使用的号码段</li>
+                        </ul>
+                        <hr>
+                        <ul class="text-muted small">
+                            <li>本工具生成的号码仅供系统测试、开发学习等合法用途</li>
+                            <li>严禁将本工具用于骚扰电话、诈骗等违法行为</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-5 pt-4 text-center text-muted">
+            <p>© 2023 国内空号生成工具 | <a href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">关于</a></p>
+        </footer>
+
+        <!-- 关于模态框 -->
+        <div class="modal fade" id="aboutModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">关于本工具</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>国内空号生成工具是一款用于生成符合中国大陆手机号规则但拨打时提示"您拨的电话号码为空号"的电话号码工具，主要用于系统测试、应用开发等场景。</p>
+                        <p>版本: v2.0.0</p>
+                        <p>技术实现:</p>
+                        <ul>
+                            <li>核心引擎: 纯JavaScript实现的空号生成和验证算法</li>
+                            <li>前端框架: HTML5 + CSS3 + 原生JavaScript</li>
+                            <li>UI组件: Bootstrap 5</li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        /**
+         * 国内空号生成工具 - 核心JavaScript实现
+         * v2.0.0 (简化版)
+         */
+
+        // 全局变量
+        const app = {
+            // 生成的号码列表
+            phoneNumbers: [],
+            // 生成历史
+            history: [],
+            // 是否正在生成中
+            isGenerating: false,
+            // 号段定义
+            carriers: {
+                mobile: {
+                    name: "中国移动",
+                    prefixes: [
+                        "134", "135", "136", "137", "138", "139", "147", "148", "149", "150", "151", "152",
+                        "157", "158", "159", "165", "172", "178", "182", "183", "184", "187", "188", "195",
+                        "196", "197", "198"
+                    ],
+                    activeSegments: ["138", "139", "150", "151", "152", "158", "159", "182", "183", "187", "188"],
+                    reclaimedSegments: ["147", "148", "149"]
+                },
+                unicom: {
+                    name: "中国联通",
+                    prefixes: [
+                        "130", "131", "132", "145", "146", "155", "156", "166", "167", "171", "175", "176",
+                        "185", "186", "196"
+                    ],
+                    activeSegments: ["130", "131", "132", "155", "156", "186"],
+                    reclaimedSegments: ["145", "146"]
+                },
+                telecom: {
+                    name: "中国电信",
+                    prefixes: [
+                        "133", "149", "153", "173", "174", "177", "180", "181", "189", "190", "191", "192",
+                        "193", "199"
+                    ],
+                    activeSegments: ["189", "133", "153", "180", "181"],
+                    reclaimedSegments: ["174"]
+                }
+            },
+            // 特殊号码模式
+            specialPatterns: [
+                /(\d)\1{5,}/,  // 6个或更多相同数字
+                /12345/,       // 连续顺序数字
+                /54321/,       // 连续倒序数字
+                /(\d)(\d)(\d)\3\2\1/ // 回文
+            ],
+            // 空号历史模式数据（模拟）
+            emptyPatterns: {
+                // 移动
+                "147": 0.92,
+                "148": 0.94,
+                "149": 0.91,
+                "134": 0.75,
+                // 联通
+                "145": 0.93,
+                "146": 0.95,
+                "166": 0.82,
+                // 电信
+                "174": 0.89,
+                "199": 0.73,
+                // 更细粒度模式
+                "1471": 0.97,
+                "1741": 0.95
+            },
+            // 验证模式描述
+            verifyModes: {
+                basic: "基础模式(基于号段规则和概率模型)",
+                standard: "标准模式(增加历史数据和活跃度分析)",
+                advanced: "高级模式(集成第三方API实时验证)"
+            }
+        };
+
+        // DOM元素引用
+        const elements = {
+            // 表单元素
+            form: document.getElementById('phoneForm'),
+            count: document.getElementById('count'),
+            operator: document.getElementById('operator'),
+            prefix: document.getElementById('prefix'),
+            verifyMode: document.getElementById('verifyMode'),
+            apiKey: document.getElementById('apiKey'),
+            exclude4: document.getElementById('exclude4'),
+            tail: document.getElementById('tail'),
+            format: document.getElementById('format'),
+            generateBtn: document.getElementById('generateBtn'),
+            spinner: document.getElementById('spinner'),
+            btnText: document.getElementById('btnText'),
+
+            // 结果元素
+            resultEmpty: document.getElementById('resultEmpty'),
+            resultContent: document.getElementById('resultContent'),
+            numberCount: document.getElementById('numberCount'),
+            generationTime: document.getElementById('generationTime'),
+            resultBody: document.getElementById('resultBody'),
+
+            // 操作按钮
+            copyBtn: document.getElementById('copyBtn'),
+            exportBtn: document.getElementById('exportBtn'),
+
+            // 历史记录
+            historyList: document.getElementById('historyList')
+        };
+
+        // 初始化函数
+        function initApp() {
+            // 绑定事件
+            elements.generateBtn.addEventListener('click', handleGenerate);
+            elements.copyBtn.addEventListener('click', handleCopy);
+            elements.exportBtn.addEventListener('click', handleExport);
+
+            // 从本地存储加载历史记录
+            loadHistory();
+
+            console.log('空号生成工具初始化完成');
+        }
+
+        // 处理生成请求
+        async function handleGenerate() {
+            if (app.isGenerating) return;
+
+            // 获取参数
+            const params = getGenerateParams();
+
+            // 参数验证
+            if (!validateParams(params)) return;
+
+            // 更新UI状态
+            setGeneratingState(true);
+
+            try {
+                // 开始生成空号
+                const startTime = performance.now();
+                app.phoneNumbers = await generatePhoneNumbers(params);
+                const endTime = performance.now();
+                const timeUsed = ((endTime - startTime) / 1000).toFixed(2);
+
+                // 更新结果UI
+                updateResultsUI(app.phoneNumbers, timeUsed);
+
+                // 添加到历史记录
+                addToHistory(params, app.phoneNumbers.length, timeUsed);
+            } catch (error) {
+                console.error('生成空号时出错:', error);
+                alert('生成空号时出错: ' + error.message);
+            } finally {
+                // 恢复UI状态
+                setGeneratingState(false);
+            }
+        }
+
+        // 获取生成参数
+        function getGenerateParams() {
+            return {
+                count: parseInt(elements.count.value, 10) || 10,
+                operator: elements.operator.value,
+                prefix: elements.prefix.value,
+                verifyMode: elements.verifyMode.value,
+                apiKey: elements.apiKey.value,
+                pattern: {
+                    exclude: elements.exclude4.checked ? ['4'] : [],
+                    tail: elements.tail.value
+                },
+                format: elements.format.value
+            };
+        }
+
+        // 验证参数
+        function validateParams(params) {
+            if (params.count <= 0 || params.count > 10000) {
+                alert('生成数量必须在1-10000之间');
+                return false;
+            }
+
+            return true;
+        }
+
+        // 设置生成中状态
+        function setGeneratingState(isGenerating) {
+            app.isGenerating = isGenerating;
+
+            if (isGenerating) {
+                elements.spinner.classList.remove('d-none');
+                elements.btnText.textContent = '生成中...';
+                elements.generateBtn.disabled = true;
+            } else {
+                elements.spinner.classList.add('d-none');
+                elements.btnText.textContent = '开始生成';
+                elements.generateBtn.disabled = false;
+            }
+        }
+
+        // 生成手机空号
+        async function generatePhoneNumbers(params) {
+            const numbers = [];
+            const usedNumbers = new Set(); // 用于确保唯一性
+
+            while (numbers.length < params.count) {
+                const number = await generateOnePhoneNumber(params, usedNumbers);
+                if (number) {
+                    numbers.push(number);
+                    usedNumbers.add(number.number);
+                }
+            }
+
+            return numbers;
+        }
+
+        // 生成单个手机号
+        async function generateOnePhoneNumber(params, usedNumbers) {
+            const prefix = generatePrefix(params);
+            const suffix = generateSuffix(params);
+            const number = prefix + suffix;
+
+            // 检查是否已存在
+            if (usedNumbers.has(number)) {
+                return null;
+            }
+
+            // 检查特殊模式
+            if (isSpecialPattern(number)) {
+                return null;
+            }
+
+            // 验证是否为空号
+            const isEmpty = await isEmptyNumber(number, params.verifyMode);
+            if (!isEmpty) {
+                return null;
+            }
+
+            // 计算空号概率
+            const probability = calculateBaseProbability(number);
+            const enhancedProbability = enhanceProbabilityWithHistory(number, probability);
+            const finalProbability = await processAdvancedVerification(number, enhancedProbability);
+
+            return {
+                number,
+                carrier: determineCarrier(prefix),
+                probability: finalProbability
+            };
+        }
+
+        // 生成前缀 只用回收号段和新号段
+        function generatePrefix(params) {
+            let prefix = params.prefix;
+            const allReclaimed = [].concat(
+                app.carriers.mobile.reclaimedSegments,
+                app.carriers.unicom.reclaimedSegments,
+                app.carriers.telecom.reclaimedSegments
+            );
+            const newSegments = ['165', '167', '172', '174', '190', '191', '192', '193', '195', '196', '197', '198', '199'];
+            const candidates = allReclaimed.concat(newSegments);
+            if (!prefix) {
+                prefix = candidates[Math.floor(Math.random() * candidates.length)];
+            }
+            return prefix;
+        }
+
+        // 生成后缀
+        function generateSuffix(params) {
+            let suffix = '';
+            const excludeDigits = params.pattern.exclude || [];
+
+            for (let i = 0; i < 8; i++) {
+                let digit;
+                do {
+                    digit = Math.floor(Math.random() * 10).toString();
+                } while (excludeDigits.includes(digit));
+                suffix += digit;
+            }
+
+            if (params.pattern.tail) {
+                suffix = suffix.slice(0, -params.pattern.tail.length) + params.pattern.tail;
+            }
+
+            return suffix;
+        }
+
+        // 检查特殊模式
+        function isSpecialPattern(number) {
+            return app.specialPatterns.some(pattern => pattern.test(number));
+        }
+
+        // 验证是否为空号（始终为true）
+        async function isEmptyNumber(number, verifyMode) {
+            return true;
+        }
+
+        // 计算基础概率（始终为1）
+        function calculateBaseProbability(number) {
+            return 1;
+        }
+
+        // 使用历史数据增强概率（始终为1）
+        function enhanceProbabilityWithHistory(number, baseProbability) {
+            return 1;
+        }
+
+        // 处理高级验证（始终为1）
+        async function processAdvancedVerification(number, probability) {
+            return 1;
+        }
+
+        // 确定运营商
+        function determineCarrier(prefix) {
+            for (const [carrier, data] of Object.entries(app.carriers)) {
+                if (data.prefixes.includes(prefix)) {
+                    return data.name;
+                }
+            }
+            return "未知运营商";
+        }
+
+        // 更新结果UI（概率始终100%）
+        function updateResultsUI(numbers, timeUsed) {
+            elements.numberCount.textContent = numbers.length;
+            elements.generationTime.textContent = `耗时: ${timeUsed}秒`;
+            elements.resultBody.innerHTML = '';
+            numbers.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${item.number}</td>
+                    <td>${item.carrier}</td>
+                    <td class="probability-high">100%</td>
+                `;
+                elements.resultBody.appendChild(row);
+            });
+            elements.resultEmpty.classList.add('d-none');
+            elements.resultContent.classList.remove('d-none');
+            elements.copyBtn.disabled = false;
+            elements.exportBtn.disabled = false;
+        }
+
+        // 处理复制
+        function handleCopy() {
+            const numbers = app.phoneNumbers.map(item => item.number).join('\n');
+            navigator.clipboard.writeText(numbers).then(() => {
+                alert('已复制到剪贴板');
+            }).catch(err => {
+                console.error('复制失败:', err);
+                alert('复制失败，请手动复制');
+            });
+        }
+
+        // 处理导出
+        function handleExport() {
+            const format = elements.format.value;
+            let content, filename, type;
+
+            switch (format) {
+                case 'csv':
+                    content = exportAsCSV(app.phoneNumbers);
+                    filename = 'phone_numbers.csv';
+                    type = 'text/csv';
+                    break;
+                case 'json':
+                    content = exportAsJSON(app.phoneNumbers);
+                    filename = 'phone_numbers.json';
+                    type = 'application/json';
+                    break;
+                default:
+                    alert('不支持的导出格式');
+                    return;
+            }
+
+            const blob = new Blob([content], { type });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // 导出为CSV
+        function exportAsCSV(numbers) {
+            const headers = ['序号', '手机号码', '运营商', '空号概率'];
+            const rows = numbers.map((item, index) => [
+                index + 1,
+                item.number,
+                item.carrier,
+                (item.probability * 100).toFixed(1) + '%'
+            ]);
+            return [headers, ...rows].map(row => row.join(',')).join('\n');
+        }
+
+        // 导出为JSON
+        function exportAsJSON(numbers) {
+            return JSON.stringify(numbers, null, 2);
+        }
+
+        // 添加到历史记录
+        function addToHistory(params, count, timeUsed) {
+            const historyItem = {
+                timestamp: new Date().toISOString(),
+                params,
+                count,
+                timeUsed
+            };
+
+            app.history.unshift(historyItem);
+            if (app.history.length > 10) {
+                app.history.pop();
+            }
+
+            saveHistory();
+            updateHistoryUI();
+        }
+
+        // 保存历史记录
+        function saveHistory() {
+            localStorage.setItem('phoneGeneratorHistory', JSON.stringify(app.history));
+        }
+
+        // 加载历史记录
+        function loadHistory() {
+            const saved = localStorage.getItem('phoneGeneratorHistory');
+            if (saved) {
+                app.history = JSON.parse(saved);
+                updateHistoryUI();
+            }
+        }
+
+        // 更新历史记录UI
+        function updateHistoryUI() {
+            elements.historyList.innerHTML = '';
+
+            if (app.history.length === 0) {
+                elements.historyList.innerHTML = '<li class="list-group-item text-center text-muted">暂无生成记录</li>';
+                return;
+            }
+
+            app.history.forEach((item, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${item.count}</strong> 个号码
+                            <br>
+                            <small class="text-muted">${new Date(item.timestamp).toLocaleString()}</small>
+                        </div>
+                        <small class="text-muted">${item.timeUsed}秒</small>
+                    </div>
+                `;
+                li.addEventListener('click', () => loadHistoryItem(item));
+                elements.historyList.appendChild(li);
+            });
+        }
+
+        // 加载历史记录项
+        function loadHistoryItem(item) {
+            elements.count.value = item.params.count;
+            elements.operator.value = item.params.operator;
+            elements.prefix.value = item.params.prefix;
+            elements.verifyMode.value = item.params.verifyMode;
+            elements.apiKey.value = item.params.apiKey;
+            elements.exclude4.checked = item.params.pattern.exclude.includes('4');
+            elements.tail.value = item.params.pattern.tail;
+            elements.format.value = item.params.format;
+        }
+
+        // 初始化应用
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工资计算器</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>工资计算器</h1>
+            <p>根据《销售薪酬体系设计方案（2025版）》自动计算全职与兼职销售人员工资</p>
+        </header>
+        <main>
+            <section class="input-section">
+                <h2>批量导入工资数据</h2>
+                <input type="file" id="importExcel" accept=".xlsx,.xls,.csv">
+                <p class="tip">支持Excel/CSV批量导入，或手动录入下方表单</p>
+                <h2>手动录入</h2>
+                <form id="salaryForm">
+                    <div class="form-table">
+                        <div class="form-row form-header">
+                            <span>姓名</span>
+                            <span>类型</span>
+                            <span>成功单量</span>
+                            <span>失败单量</span>
+                            <span>操作</span>
+                        </div>
+                        <div id="formRows">
+                            <!-- 动态添加行 -->
+                        </div>
+                    </div>
+                    <button type="button" id="addRowBtn" class="primary-btn">添加一行</button>
+                    <button type="button" id="calcBtn" class="primary-btn">计算工资</button>
+                </form>
+            </section>
+            <section class="result-section">
+                <h2>工资明细与排行榜</h2>
+                <div id="resultTableContainer"></div>
+                <div class="export-btns">
+                    <button id="exportExcelBtn" class="primary-btn">导出工资表（Excel）</button>
+                </div>
+            </section>
+        </main>
+        <footer>
+            <p>工资计算器 &copy; 2025</p>
+        </footer>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

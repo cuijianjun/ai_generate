@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国内空号生成工具</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 自定义CSS -->
+    <link rel="stylesheet" href="static/css/style.css">
+    <!-- Font Awesome 图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container mt-4 mb-5">
+        <header class="mb-4 text-center">
+            <h1 class="display-5 fw-bold">国内空号生成工具</h1>
+            <p class="text-muted">生成符合中国大陆手机号规则但拨打时提示"您拨的电话号码为空号"的电话号码</p>
+        </header>
+
+        <div class="row">
+            <!-- 左侧参数设置面板 -->
+            <div class="col-md-4">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="card-title mb-0">参数设置</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="phoneForm">
+                            <!-- 生成数量 -->
+                            <div class="mb-3">
+                                <label for="count" class="form-label">生成数量</label>
+                                <input type="number" class="form-control" id="count" min="1" max="10000" value="10">
+                                <div class="form-text">最多可生成10,000个号码</div>
+                            </div>
+
+                            <!-- 运营商 -->
+                            <div class="mb-3">
+                                <label for="operator" class="form-label">运营商</label>
+                                <select class="form-select" id="operator">
+                                    <option value="all" selected>全部</option>
+                                    <option value="mobile">中国移动</option>
+                                    <option value="unicom">中国联通</option>
+                                    <option value="telecom">中国电信</option>
+                                </select>
+                            </div>
+
+                            <!-- 前缀限制 -->
+                            <div class="mb-3">
+                                <label for="prefix" class="form-label">前缀限制 (可选)</label>
+                                <input type="text" class="form-control" id="prefix" placeholder="如: 138">
+                            </div>
+
+                            <!-- 空号验证模式 -->
+                            <div class="mb-3">
+                                <label for="verifyMode" class="form-label">空号验证模式</label>
+                                <select class="form-select" id="verifyMode">
+                                    <option value="basic" selected>基础模式 (准确率约75-85%)</option>
+                                    <option value="standard">标准模式 (准确率约85-95%)</option>
+                                    <option value="advanced">高级模式 (准确率约95%以上)</option>
+                                </select>
+                                <div id="verifyModeHelp" class="form-text">基于号段规则和概率模型生成空号</div>
+                            </div>
+
+                            <!-- API密钥 (高级模式) -->
+                            <div class="mb-3 d-none" id="apiKeyGroup">
+                                <label for="apiKey" class="form-label">API密钥 (高级模式必需)</label>
+                                <input type="password" class="form-control" id="apiKey" placeholder="输入您的API密钥">
+                                <div class="form-text">用于调用第三方空号验证API</div>
+                            </div>
+
+                            <!-- 特殊要求 -->
+                            <div class="mb-3">
+                                <label class="form-label">特殊要求 (可选)</label>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="exclude4">
+                                    <label class="form-check-label" for="exclude4">排除数字4</label>
+                                </div>
+                                <div class="input-group">
+                                    <span class="input-group-text">指定尾号</span>
+                                    <input type="text" class="form-control" id="tail" placeholder="如: 8888">
+                                </div>
+                            </div>
+
+                            <!-- 导出格式 -->
+                            <div class="mb-3">
+                                <label for="format" class="form-label">导出格式</label>
+                                <select class="form-select" id="format">
+                                    <option value="csv" selected>CSV</option>
+                                    <option value="excel">Excel</option>
+                                    <option value="json">JSON</option>
+                                </select>
+                            </div>
+
+                            <!-- 生成按钮 -->
+                            <div class="d-grid gap-2">
+                                <button type="button" id="generateBtn" class="btn btn-primary">
+                                    <span id="spinner" class="spinner-border spinner-border-sm d-none" role="status"
+                                        aria-hidden="true"></span>
+                                    <span id="btnText">开始生成</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- 历史记录面板 -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="card-title mb-0">生成历史</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <ul class="list-group list-group-flush" id="historyList">
+                            <li class="list-group-item text-center text-muted">暂无生成记录</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧结果展示面板 -->
+            <div class="col-md-8">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">生成结果</h5>
+                        <div>
+                            <button id="copyBtn" class="btn btn-sm btn-light me-2" disabled>
+                                <i class="fas fa-copy"></i> 复制
+                            </button>
+                            <button id="exportBtn" class="btn btn-sm btn-light" disabled>
+                                <i class="fas fa-download"></i> 导出
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="resultEmpty" class="text-center py-5">
+                            <p class="text-muted">请设置参数并点击"开始生成"按钮</p>
+                        </div>
+
+                        <div id="resultContent" class="d-none">
+                            <div class="alert alert-info mb-3">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>共生成了 <strong id="numberCount">0</strong> 个空号</span>
+                                    <span id="generationTime"></span>
+                                </div>
+                                <div class="mt-2 small">
+                                    验证模式: <span id="usedVerifyMode" class="fw-bold">基础模式</span>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover" id="resultTable">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>手机号码</th>
+                                            <th>运营商</th>
+                                            <th>空号概率</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resultBody">
+                                        <!-- 结果将动态填充 -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 空号说明面板 -->
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="card-title mb-0">空号说明</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-warning">
+                            <strong>空号定义：</strong>符合运营商电话号码格式规则，但拨打时提示"您拨的电话号码为空号"的电话号码。
+                        </div>
+                        <p>空号主要包括以下几种情况：</p>
+                        <ul>
+                            <li>未被运营商分配给用户的号码</li>
+                            <li>曾经分配但已经被注销/收回的号码</li>
+                            <li>运营商保留但未投入使用的号码段</li>
+                        </ul>
+                        <hr>
+                        <ul class="text-muted small">
+                            <li>本工具生成的号码仅供系统测试、开发学习等合法用途</li>
+                            <li>即使使用高级验证模式，仍无法100%保证所有生成的号码为空号</li>
+                            <li>严禁将本工具用于骚扰电话、诈骗等违法行为</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-5 pt-4 text-center text-muted">
+            <p>© 2023 国内空号生成工具 | <a href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">关于</a></p>
+        </footer>
+
+        <!-- 关于模态框 -->
+        <div class="modal fade" id="aboutModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">关于本工具</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>国内空号生成工具是一款用于生成符合中国大陆手机号规则但拨打时提示"您拨的电话号码为空号"的电话号码工具，主要用于系统测试、应用开发等场景。</p>
+                        <p>版本: v2.0.0</p>
+                        <p>技术实现:</p>
+                        <ul>
+                            <li>核心引擎: 纯JavaScript实现的空号生成和验证算法</li>
+                            <li>前端框架: HTML5 + CSS3 + 原生JavaScript</li>
+                            <li>UI组件: Bootstrap 5</li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- 自定义JS -->
+    <script src="static/js/app.js"></script>
+</body>
+
+</html>

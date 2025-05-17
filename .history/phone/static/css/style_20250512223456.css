@@ -1,0 +1,143 @@
+/* 空号生成工具 - 样式表 */
+
+/* 全局样式 */
+body {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+/* 卡片增强样式 */
+.card {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.card-header {
+  border-bottom: 0;
+  padding: 0.75rem 1.25rem;
+}
+
+.card:hover {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+}
+
+/* 表格样式 */
+.table {
+  margin-bottom: 0;
+}
+
+.table th {
+  font-weight: 600;
+  background-color: rgba(0, 0, 0, 0.03);
+}
+
+/* 按钮样式 */
+.btn {
+  border-radius: 0.25rem;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background-color: #0d6efd;
+  border-color: #0d6efd;
+}
+
+.btn-primary:hover {
+  background-color: #0b5ed7;
+  border-color: #0a58ca;
+}
+
+/* 历史记录项样式 */
+#historyList .list-group-item {
+  padding: 0.75rem 1.25rem;
+  border-left: none;
+  border-right: none;
+  transition: background-color 0.2s ease;
+}
+
+#historyList .list-group-item:hover {
+  background-color: rgba(0, 0, 0, 0.03);
+  cursor: pointer;
+}
+
+#historyList .list-group-item:first-child {
+  border-top: none;
+}
+
+/* 结果表格样式 */
+#resultTable {
+  font-size: 0.95rem;
+}
+
+#resultBody tr {
+  transition: background-color 0.2s ease;
+}
+
+#resultBody tr:hover {
+  background-color: rgba(13, 110, 253, 0.05);
+}
+
+/* 表单控件增强 */
+.form-control:focus,
+.form-select:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* 空结果提示 */
+#resultEmpty {
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 高亮空号概率 */
+.probability-high {
+  color: #198754;
+  font-weight: 600;
+}
+
+.probability-medium {
+  color: #fd7e14;
+  font-weight: 600;
+}
+
+.probability-low {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  #resultTable {
+    font-size: 0.85rem;
+  }
+
+  .card-body {
+    padding: 1rem;
+  }
+
+  .container {
+    padding: 0 0.75rem;
+  }
+}
+
+/* 复制和导出按钮样式 */
+#copyBtn:hover,
+#exportBtn:hover {
+  background-color: #e2e6ea;
+  border-color: #dae0e5;
+}
+
+/* 弹出框样式 */
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-footer {
+  background-color: #f8f9fa;
+  border-top: 1px solid #dee2e6;
+}

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工资计算器</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>工资计算器</h1>
+            <p>快速计算您的工资，包含各项明细</p>
+        </header>
+
+        <main>
+            <div class="calculator">
+                <div class="input-section">
+                    <h2>基本信息</h2>
+                    <div class="form-group">
+                        <label for="name">员工姓名</label>
+                        <input type="text" id="name" placeholder="请输入姓名">
+                    </div>
+                    <div class="form-group">
+                        <label for="position">职位/职级</label>
+                        <input type="text" id="position" placeholder="请输入职位">
+                    </div>
+                    <div class="form-group">
+                        <label for="baseSalary">基本工资(元)</label>
+                        <input type="number" id="baseSalary" placeholder="请输入基本工资">
+                    </div>
+                    <div class="form-group">
+                        <label for="workDays">出勤天数</label>
+                        <input type="number" id="workDays" placeholder="实际出勤天数" value="21.75">
+                    </div>
+                    <div class="form-group">
+                        <label for="performanceRating">绩效评级</label>
+                        <select id="performanceRating">
+                            <option value="1.2">A (优秀)</option>
+                            <option value="1.0" selected>B (良好)</option>
+                            <option value="0.8">C (一般)</option>
+                            <option value="0.6">D (较差)</option>
+                        </select>
+                    </div>
+
+                    <h2>加班信息</h2>
+                    <div class="form-group">
+                        <label for="weekdayOvertime">工作日加班(小时)</label>
+                        <input type="number" id="weekdayOvertime" placeholder="工作日加班时长" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="weekendOvertime">休息日加班(小时)</label>
+                        <input type="number" id="weekendOvertime" placeholder="休息日加班时长" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="holidayOvertime">法定节假日加班(小时)</label>
+                        <input type="number" id="holidayOvertime" placeholder="法定节假日加班时长" value="0">
+                    </div>
+
+                    <h2>社保公积金信息</h2>
+                    <div class="form-group">
+                        <label for="socialSecurityBase">社保基数(元)</label>
+                        <input type="number" id="socialSecurityBase" placeholder="社保基数">
+                    </div>
+                    <div class="form-group">
+                        <label for="housingFundBase">公积金基数(元)</label>
+                        <input type="number" id="housingFundBase" placeholder="公积金基数">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="socialSecurityRate">社保个人缴纳比例(%)</label>
+                        <input type="number" id="socialSecurityRate" placeholder="例如: 10.5" value="10.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="housingFundRate">公积金个人缴纳比例(%)</label>
+                        <input type="number" id="housingFundRate" placeholder="例如: 12" value="12">
+                    </div>
+
+                    <h2>其他津贴</h2>
+                    <div class="form-group">
+                        <label for="mealAllowance">餐补(元)</label>
+                        <input type="number" id="mealAllowance" placeholder="餐饮补贴" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="transportAllowance">交通补贴(元)</label>
+                        <input type="number" id="transportAllowance" placeholder="交通补贴" value="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="otherAllowance">其他补贴(元)</label>
+                        <input type="number" id="otherAllowance" placeholder="其他补贴" value="0">
+                    </div>
+
+                    <div class="button-group">
+                        <button id="calculateBtn" class="primary-btn">计算工资</button>
+                        <button id="resetBtn" class="secondary-btn">重置</button>
+                    </div>
+                </div>
+
+                <div class="result-section" id="resultSection">
+                    <h2>工资计算结果</h2>
+                    <div class="result-container">
+                        <div class="result-item">
+                            <span class="result-label">基本工资:</span>
+                            <span class="result-value" id="resultBaseSalary">0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">绩效工资:</span>
+                            <span class="result-value" id="resultPerformance">0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">加班费:</span>
+                            <span class="result-value" id="resultOvertime">0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">补贴合计:</span>
+                            <span class="result-value" id="resultAllowance">0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">社保个人部分:</span>
+                            <span class="result-value" id="resultSocialSecurity">0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">公积金个人部分:</span>
+                            <span class="result-value" id="resultHousingFund">0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">应纳税所得额:</span>
+                            <span class="result-value" id="resultTaxableIncome">0.00</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">个人所得税:</span>
+                            <span class="result-value" id="resultTax">0.00</span>
+                        </div>
+                        <div class="result-item total">
+                            <span class="result-label">税前工资:</span>
+                            <span class="result-value" id="resultBeforeTax">0.00</span>
+                        </div>
+                        <div class="result-item total">
+                            <span class="result-label">税后工资:</span>
+                            <span class="result-value" id="resultAfterTax">0.00</span>
+                        </div>
+                    </div>
+                    <div class="export-section">
+                        <button id="exportBtn" class="primary-btn">导出工资单</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>工资计算器 &copy; 2023 版权所有</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>

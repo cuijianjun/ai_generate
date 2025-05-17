@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工资计算器 - Element Plus版</title>
+    <!-- Element Plus CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/element-plus/dist/index.css">
+    <script src="https://unpkg.com/vue@3"></script>
+    <script src="https://unpkg.com/element-plus"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        body {
+            background: #f5f7fa;
+        }
+
+        #app {
+            max-width: 1200px;
+            margin: 30px auto;
+        }
+
+        .el-header {
+            text-align: center;
+            font-size: 26px;
+            color: #2b6cb0;
+        }
+
+        .el-footer {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .import-card,
+        .input-card {
+            margin-bottom: 20px;
+        }
+
+        .input-table .el-input,
+        .input-table .el-select {
+            width: 100%;
+        }
+
+        .input-table .el-button {
+            padding: 6px 12px;
+        }
+
+        .result-table {
+            margin-top: 30px;
+            overflow-x: auto;
+        }
+
+        .result-table .el-table {
+            width: 100%;
+            min-width: 1200px;
+        }
+
+        /* 新增：原生表格样式 */
+        .salary-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 14px;
+            text-align: center;
+            background: white;
+        }
+
+        .salary-table th {
+            background: #f5f7fa;
+            padding: 12px 8px;
+            font-weight: bold;
+            border: 1px solid #ebeef5;
+            color: #606266;
+        }
+
+        .salary-table td {
+            padding: 12px 8px;
+            border: 1px solid #ebeef5;
+            color: #606266;
+        }
+
+        .salary-table tr:hover {
+            background-color: #f5f7fa;
+        }
+
+        .salary-table .top-rank-row {
+            background: #fffbe6;
+            font-weight: bold;
+        }
+
+        .salary-table .top-rank-row:hover {
+            background: #fff7cc;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 20px 0;
+        }
+
+        .table-header {
+            font-size: 18px;
+            color: #303133;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .export-btn {
+            margin: 15px 0;
+        }
+
+        /* 让手动录入表格占满整个模块 */
+        .input-card {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .input-card ::v-deep .el-card__body {
+            padding: 0 !important;
+        }
+
+        .input-table-wrapper {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .input-table {
+            width: 100% !important;
+            max-width: 100% !important;
+            min-width: 100% !important;
+            margin: 0 !important;
+            display: block;
+        }
+
+        .input-actions {
+            margin-top: 12px;
+            text-align: left;
+            padding-left: 16px;
+        }
+
+        .el-col,
+        .el-row {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <el-container>
+            <el-header>工资计算器（Element Plus 版）</el-header>
+            <el-main>
+                <el-row :gutter="20">
+                    <!-- 导入与模板 -->
+                    <el-col :span="6">
+                        <el-card class="import-card" shadow="hover">
+                            <template #header>批量导入/模板下载</template>
+                            <el-upload :show-file-list="false" accept=".xlsx,.xls,.csv" :before-upload="beforeUpload"
+                                :on-change="handleImport">
+                                <el-button type="primary" size="small">导入工资表</el-button>
+                            </el-upload>
+                            <el-button type="success" size="small" @click="downloadTemplate"
+                                style="margin-top:10px;">下载模板</el-button>
+                            <el-alert type="info" :closable="false" style="margin-top:10px;">
+                                支持Excel/CSV批量导入，或下载模板填写后导入
+                            </el-alert>
+                        </el-card>
+                    </el-col>
+                    <!-- 手动录入 -->
+                    <el-col :span="18">
+                        <el-card class="input-card" shadow="hover">
+                            <template #header>手动录入</template>
+                            <div class="input-actions" style="margin-bottom: 8px;">
+                                <el-button type="primary" size="small" @click="addRow">添加一行</el-button>
+                                <el-button type="primary" size="small" @click="calculate">计算工资</el-button>
+                            </div>
+                            <div class="input-table-wrapper">
+                                <el-table :data="inputRows" border class="input-table"
+                                    style="width: 100%; table-layout: fixed;">
+                                    <el-table-column prop="name" label="姓名" min-width="100">
+                                        <template #default="scope">
+                                            <el-input v-model="scope.row.name" size="small" @change="saveRows" />
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="type" label="类型" min-width="80">
+                                        <template #default="scope">
+                                            <el-select v-model="scope.row.type" size="small" @change="saveRows">
+                                                <el-option label="全职" value="全职" />
+                                                <el-option label="兼职" value="兼职" />
+                                            </el-select>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="success" label="成功单量" min-width="100">
+                                        <template #default="scope">
+                                            <el-input v-model.number="scope.row.success" type="number" min="0"
+                                                size="small" @change="saveRows" />
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column prop="fail" label="失败单量" min-width="100">
+                                        <template #default="scope">
+                                            <el-input v-model.number="scope.row.fail" type="number" min="0" size="small"
+                                                @change="saveRows" />
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column label="操作" min-width="80">
+                                        <template #default="scope">
+                                            <el-button type="danger" size="small"
+                                                @click="removeRow(scope.$index)">删除</el-button>
+                                        </template>
+                                    </el-table-column>
+                                </el-table>
+                            </div>
+                        </el-card>
+                    </el-col>
+                </el-row>
+                <!-- 结果表格（合并排行榜和工资明细） -->
+                <el-row v-if="results.length">
+                    <el-col :span="24">
+                        <el-card class="result-table" shadow="hover">
+                            <template #header>
+                                <div class="table-header">工资明细与排行榜</div>
+                            </template>
+                            <div style="overflow-x:auto;">
+                                <el-table :data="rankedResults" style="width:100%; min-width:1200px;">
+                                    <el-table-column prop="rank" label="排名" width="60" />
+                                    <el-table-column prop="name" label="姓名" width="100" />
+                                    <el-table-column prop="type" label="类型" width="80" />
+                                    <el-table-column prop="success" label="成功单量" width="100" />
+                                    <el-table-column prop="fail" label="失败单量" width="100" />
+                                    <el-table-column prop="scrapRate" label="报废率" width="90" />
+                                    <el-table-column prop="baseSalary" label="底薪" width="80" />
+                                    <el-table-column prop="commissionDetail" label="提成明细" width="180" />
+                                    <el-table-column prop="commission" label="提成合计" width="100" />
+                                    <el-table-column prop="scrapRemark" label="报废奖惩" width="120" />
+                                    <el-table-column prop="totalSalary" label="总薪资" width="100" />
+                                    <el-table-column prop="costPerOrder" label="单均成本" width="100" />
+                                </el-table>
+                            </div>
+                            <div class="export-btn">
+                                <el-button type="success" size="small" @click="exportExcel">导出工资表（Excel）</el-button>
+                            </div>
+                        </el-card>
+                    </el-col>
+                </el-row>
+            </el-main>
+            <el-footer>工资计算器 &copy; 2025</el-footer>
+        </el-container>
+    </div>
+    <script>
+        const { createApp, ref, computed, onMounted } = Vue;
+        createApp({
+            setup() {
+                // 默认演示数据
+                const inputRows = ref([
+                    { name: '张三', type: '全职', success: 1200, fail: 50 },
+                    { name: '李四', type: '兼职', success: 800, fail: 30 },
+                    { name: '王五', type: '全职', success: 1500, fail: 20 },
+                    { name: '赵六', type: '兼职', success: 1000, fail: 10 },
+                    { name: '小明', type: '全职', success: 900, fail: 5 },
+                    { name: '小红', type: '兼职', success: 600, fail: 8 },
+                    { name: '小刚', type: '全职', success: 1100, fail: 12 },
+                    { name: '小美', type: '兼职', success: 700, fail: 6 },
+                    { name: '小强', type: '全职', success: 1300, fail: 15 },
+                    { name: '小丽', type: '兼职', success: 500, fail: 3 },
+                    { name: '小张', type: '全职', success: 400, fail: 2 }
+                ]);
+                const results = ref([]);
+
+                function saveRows() {
+                    const map = {};
+                    inputRows.value.forEach(row => {
+                        if (row.name) map[row.name] = { ...row };
+                    });
+                    localStorage.setItem('salaryData', JSON.stringify(Object.values(map)));
+                }
+                function loadRows() {
+                    try {
+                        const arr = JSON.parse(localStorage.getItem('salaryData') || '[]');
+                        inputRows.value = arr.length ? arr : [
+                            { name: '张三', type: '全职', success: 1200, fail: 50 },
+                            { name: '李四', type: '兼职', success: 800, fail: 30 },
+                            { name: '王五', type: '全职', success: 1500, fail: 20 },
+                            { name: '赵六', type: '兼职', success: 1000, fail: 10 },
+                            { name: '小明', type: '全职', success: 900, fail: 5 },
+                            { name: '小红', type: '兼职', success: 600, fail: 8 },
+                            { name: '小刚', type: '全职', success: 1100, fail: 12 },
+                            { name: '小美', type: '兼职', success: 700, fail: 6 },
+                            { name: '小强', type: '全职', success: 1300, fail: 15 },
+                            { name: '小丽', type: '兼职', success: 500, fail: 3 },
+                            { name: '小张', type: '全职', success: 400, fail: 2 }
+                        ];
+                    } catch {
+                        inputRows.value = [
+                            { name: '张三', type: '全职', success: 1200, fail: 50 },
+                            { name: '李四', type: '兼职', success: 800, fail: 30 },
+                            { name: '王五', type: '全职', success: 1500, fail: 20 },
+                            { name: '赵六', type: '兼职', success: 1000, fail: 10 },
+                            { name: '小明', type: '全职', success: 900, fail: 5 },
+                            { name: '小红', type: '兼职', success: 600, fail: 8 },
+                            { name: '小刚', type: '全职', success: 1100, fail: 12 },
+                            { name: '小美', type: '兼职', success: 700, fail: 6 },
+                            { name: '小强', type: '全职', success: 1300, fail: 15 },
+                            { name: '小丽', type: '兼职', success: 500, fail: 3 },
+                            { name: '小张', type: '全职', success: 400, fail: 2 }
+                        ];
+                    }
+                }
+                function addRow() {
+                    // 校验上一行是否填写完整
+                    if (inputRows.value.length > 0) {
+                        const last = inputRows.value[inputRows.value.length - 1];
+                        if (!last.name || !last.type || last.success === '' || last.success === null || last.fail === '' || last.fail === null) {
+                            ElementPlus.ElMessage.warning('请先填写完整上一行再添加新行');
+                            return;
+                        }
+                    }
+                    inputRows.value.push({ name: '', type: '全职', success: 0, fail: 0 });
+                    saveRows();
+                }
+                function removeRow(idx) {
+                    inputRows.value.splice(idx, 1);
+                    saveRows();
+                }
+                function beforeUpload() { return false; }
+                function handleImport(file) {
+                    const reader = new FileReader();
+                    reader.onload = function (evt) {
+                        const data = evt.target.result;
+                        const workbook = XLSX.read(data, { type: 'binary' });
+                        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                        let arr = [];
+                        for (let i = 1; i < json.length; i++) {
+                            const [name, type, success, fail] = json[i];
+                            if (name) arr.push({ name, type: type || '全职', success: Number(success) || 0, fail: Number(fail) || 0 });
+                        }
+                        const map = {};
+                        arr.forEach(row => { map[row.name] = row; });
+                        inputRows.value = Object.values(map);
+                        saveRows();
+                        ElementPlus.ElMessage.success('导入成功，共' + inputRows.value.length + '行');
+                    };
+                    reader.readAsBinaryString(file.raw);
+                }
+                function downloadTemplate() {
+                    const ws_data = [
+                        ['姓名', '类型', '成功单量', '失败单量'],
+                        ['张三', '全职', 1200, 50],
+                        ['李四', '兼职', 800, 30],
+                        ['王五', '全职', 1500, 20],
+                        ['赵六', '兼职', 1000, 10],
+                        ['小明', '全职', 900, 5],
+                        ['小红', '兼职', 600, 8],
+                        ['小刚', '全职', 1100, 12],
+                        ['小美', '兼职', 700, 6],
+                        ['小强', '全职', 1300, 15],
+                        ['小丽', '兼职', 500, 3],
+                        ['小张', '全职', 400, 2]
+                    ];
+                    const ws = XLSX.utils.aoa_to_sheet(ws_data);
+                    const wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, '模板');
+                    XLSX.writeFile(wb, '工资导入模板.xlsx');
+                }
+                function calculate() {
+                    // 按名字去重，保留最后一次
+                    const map = {};
+                    inputRows.value.forEach(row => {
+                        if (row.name) map[row.name] = { ...row };
+                    });
+                    const unique = Object.values(map);
+                    if (!unique.length) {
+                        ElementPlus.ElMessage.warning('请至少输入一行有效数据');
+                        return;
+                    }
+                    const resultArr = unique.map(calcSalaryDetail).sort((a, b) => b.totalSalary - a.totalSalary);
+                    results.value.length = 0;
+                    resultArr.forEach(item => results.value.push(item));
+                    // 记录所有算过工资的明细
+                    localStorage.setItem('salaryResults', JSON.stringify(resultArr));
+                    localStorage.setItem('salaryData', JSON.stringify(unique));
+                    setTimeout(() => {
+                        const el = document.querySelector('.result-table');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }, 200);
+                }
+                function calcSalaryDetail({ name, type, success, fail }) {
+                    success = Number(success) || 0;
+                    fail = Number(fail) || 0;
+                    const total = success + fail;
+                    const scrapRate = total > 0 ? fail / total : 0;
+                    let baseSalary = 0, commission = 0, commissionDetail = [], totalSalary = 0, costPerOrder = 0;
+                    let scrapReward = 1.03, scrapRemark = '';
+                    if (scrapRate <= 0.07) {
+                        scrapReward = 1.03; scrapRemark = '达标，奖励3%提成';
+                    } else if (scrapRate > 0.1) {
+                        scrapReward = 0; scrapRemark = '>10%，提成冻结';
+                    } else {
+                        const over = Math.ceil((scrapRate - 0.07) * 100);
+                        scrapReward = 1.03 - over * 0.03;
+                        scrapRemark = `超标${over}%扣${over * 3}%提成`;
+                    }
+                    let remain = success;
+                    if (type === '全职') {
+                        if (success > 500) baseSalary = 2000;
+                        const segs = [500, 500, 500, Infinity], rates = [2.5, 3.5, 4.5, 5.5];
+                        for (let i = 0; i < segs.length && remain > 0; i++) {
+                            const seg = Math.min(remain, segs[i]);
+                            commission += seg * rates[i];
+                            commissionDetail.push(`${seg}×${rates[i]}`);
+                            remain -= seg;
+                        }
+                        totalSalary = (baseSalary + commission) * scrapReward;
+                        costPerOrder = success > 0 ? totalSalary / success + 3 : 0;
+                    } else {
+                        const segs = [500, 500, 500, Infinity], rates = [3.5, 4.0, 5.0, 5.5];
+                        for (let i = 0; i < segs.length && remain > 0; i++) {
+                            const seg = Math.min(remain, segs[i]);
+                            commission += seg * rates[i];
+                            commissionDetail.push(`${seg}×${rates[i]}`);
+                            remain -= seg;
+                        }
+                        totalSalary = commission * scrapReward;
+                        let less1000 = Math.min(success, 1000), more1000 = Math.max(success - 1000, 0);
+                        costPerOrder = success > 0 ? totalSalary / success + (3 * (less1000 / success) + 1.5 * (more1000 / success)) : 0;
+                    }
+                    if (scrapReward === 0) { totalSalary = 0; costPerOrder = 0; }
+                    return {
+                        name,
+                        type,
+                        success,
+                        fail,
+                        scrapRate: (scrapRate * 100).toFixed(2) + '%',
+                        baseSalary: Number(baseSalary.toFixed(2)),
+                        commission: Number(commission.toFixed(2)),
+                        commissionDetail: commissionDetail.join(' + '),
+                        scrapRemark,
+                        totalSalary: Number(totalSalary.toFixed(2)),
+                        costPerOrder: Number(costPerOrder.toFixed(2))
+                    };
+                }
+                function exportExcel() {
+                    const table = document.querySelector('.result-table table');
+                    if (!table) {
+                        ElementPlus.ElMessage.warning('请先计算并生成工资表');
+                        return;
+                    }
+                    const wb = XLSX.utils.table_to_book(table, { sheet: '工资表' });
+                    XLSX.writeFile(wb, '工资表与排行榜.xlsx');
+                }
+                // 排名逻辑：所有人员，支持并列名次，第一名高亮
+                const rankedResults = computed(() => {
+                    if (!results.value.length) return [];
+                    let rank = 1, lastSalary = null, sameCount = 0;
+                    return results.value.map((item, idx) => {
+                        if (lastSalary === item.totalSalary) {
+                            sameCount++;
+                        } else {
+                            rank = idx + 1;
+                            sameCount = 1;
+                        }
+                        lastSalary = item.totalSalary;
+                        return { ...item, rank, isTop: rank === 1 };
+                    });
+                });
+                // 排行榜表格高亮第一名
+                function tableRankClass({ row }) {
+                    return row.isTop ? 'top-rank-row' : '';
+                }
+                onMounted(() => {
+                    // 页面加载时自动读取明细
+                    const arr = JSON.parse(localStorage.getItem('salaryResults') || '[]');
+                    if (Array.isArray(arr) && arr.length) {
+                        results.value.length = 0;
+                        arr.forEach(item => results.value.push(item));
+                    }
+                    // 也加载输入数据
+                    const inputArr = JSON.parse(localStorage.getItem('salaryData') || '[]');
+                    if (Array.isArray(inputArr) && inputArr.length) {
+                        inputRows.value = inputArr;
+                    }
+                    calculate();
+                });
+                return {
+                    inputRows, results,
+                    addRow, removeRow, calculate, saveRows,
+                    beforeUpload, handleImport, downloadTemplate, exportExcel,
+                    rankedResults, tableRankClass
+                };
+            }
+        }).use(ElementPlus).mount('#app');
+    </script>
+</body>
+
+</html>

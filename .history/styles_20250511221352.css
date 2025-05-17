@@ -1,0 +1,208 @@
+body {
+  font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana,
+    sans-serif;
+  background: #f5f7fa;
+  color: #222;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 30px 10px 10px 10px;
+}
+header {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+  padding: 24px 0 16px 0;
+  text-align: center;
+  margin-bottom: 30px;
+}
+header h1 {
+  color: #2b6cb0;
+  margin-bottom: 8px;
+}
+header p {
+  color: #718096;
+  font-size: 16px;
+}
+.main-flex {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  margin-bottom: 20px;
+}
+.import-section {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+  padding: 24px 20px 20px 20px;
+  flex: 0 1 320px;
+  min-width: 260px;
+  max-width: 350px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+}
+.import-section h2 {
+  color: #2b6cb0;
+  font-size: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+  margin-top: 0;
+}
+.import-btns {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 10px;
+  align-items: center;
+}
+.input-section {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+  padding: 24px 20px 20px 20px;
+  flex: 1 1 480px;
+  min-width: 340px;
+}
+.input-section h2 {
+  margin-top: 0;
+  color: #2b6cb0;
+  font-size: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+}
+.tip {
+  color: #e53e3e;
+  font-size: 14px;
+  margin-bottom: 10px;
+  background: #fff5f5;
+  border-left: 4px solid #e53e3e;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+.form-table {
+  width: 100%;
+  margin-bottom: 10px;
+}
+.form-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.form-header {
+  font-weight: bold;
+  color: #2b6cb0;
+  background: #f0f4fa;
+  border-radius: 4px;
+  padding: 6px 0;
+}
+.form-row input,
+.form-row select {
+  padding: 6px 8px;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  font-size: 15px;
+  width: 100px;
+}
+.form-row select {
+  width: 90px;
+}
+.form-row button {
+  background: #e53e3e;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.form-btns {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.primary-btn {
+  background: #3182ce;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 18px;
+  font-size: 15px;
+  margin-right: 0;
+  margin-top: 0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.primary-btn:hover {
+  background: #2563eb;
+}
+.export-btns {
+  margin-top: 18px;
+  text-align: right;
+}
+.result-section {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.07);
+  padding: 24px 20px 20px 20px;
+  margin-top: 20px;
+}
+.result-section h2 {
+  color: #2b6cb0;
+  font-size: 20px;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 6px;
+  margin-bottom: 12px;
+}
+#resultTableContainer {
+  margin-top: 10px;
+  overflow-x: auto;
+}
+table.salary-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+  background: #f9fafb;
+}
+table.salary-table th,
+table.salary-table td {
+  border: 1px solid #e2e8f0;
+  padding: 8px 6px;
+  text-align: center;
+  font-size: 15px;
+}
+table.salary-table th {
+  background: #ebf8ff;
+  color: #2b6cb0;
+}
+table.salary-table tr:nth-child(even) {
+  background: #f0f4fa;
+}
+table.salary-table .highlight {
+  background: #fefcbf;
+  font-weight: bold;
+}
+footer {
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+  margin-top: 40px;
+  padding-bottom: 10px;
+}
+@media (max-width: 900px) {
+  .main-flex {
+    flex-direction: column;
+  }
+  .import-section,
+  .input-section {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+}
