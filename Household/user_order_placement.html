@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户端 - 在线下单</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1,
+        h2 {
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="tel"],
+        select,
+        textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section:last-child {
+            border-bottom: none;
+        }
+
+        .calendar-placeholder,
+        .map-placeholder {
+            background-color: #e9ecef;
+            padding: 20px;
+            text-align: center;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+
+        .order-preview {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>在线下单</h1>
+
+        <div class="section">
+            <h2>1. 选择服务类型</h2>
+            <label for="service-type">服务类型:</label>
+            <select id="service-type" name="service-type">
+                <option value="cleaning">保洁</option>
+                <option value="nanny">月嫂</option>
+                <option value="repair">维修</option>
+                <!-- 更多服务类型 -->
+            </select>
+        </div>
+
+        <div class="section">
+            <h2>2. 选择服务时间</h2>
+            <label for="service-date">服务日期和时段:</label>
+            <div class="calendar-placeholder">可视化日历 + 时段选择区域</div>
+            <!-- 实际应用中这里会是一个日历和时间选择组件 -->
+        </div>
+
+        <div class="section">
+            <h2>3. 服务地址</h2>
+            <label for="address">地址:</label>
+            <div class="map-placeholder">地图定位/手动输入自动补全区域</div>
+            <input type="text" id="address" name="address" placeholder="例如：XX市XX区XX街道XX号">
+        </div>
+
+        <div class="section">
+            <h2>4. 联系方式</h2>
+            <label for="phone">手机号码:</label>
+            <input type="tel" id="phone" name="phone" placeholder="请输入11位手机号">
+            <!-- 实时验证手机号格式 -->
+        </div>
+
+        <div class="section">
+            <h2>5. 选择商家/师傅 (可选)</h2>
+            <p>系统将根据您的位置和时间智能推荐。</p>
+            <!-- 此处可以有推荐列表或搜索功能 -->
+            <label for="preferred-provider">指定商家/师傅 (可选):</label>
+            <input type="text" id="preferred-provider" name="preferred-provider" placeholder="输入商家或师傅名称">
+        </div>
+
+        <div class="section">
+            <h2>6. 订单预览</h2>
+            <div class="order-preview">
+                <p><strong>服务类型:</strong> <span id="preview-service">待选择</span></p>
+                <p><strong>服务时间:</strong> <span id="preview-time">待选择</span></p>
+                <p><strong>服务地址:</strong> <span id="preview-address">待填写</span></p>
+                <p><strong>联系电话:</strong> <span id="preview-phone">待填写</span></p>
+                <p><strong>预计费用:</strong> <span id="preview-cost">¥XXX</span></p>
+            </div>
+        </div>
+
+        <button type="button" class="button">安全支付</button>
+        <!-- 集成微信支付接口 -->
+    </div>
+
+    <script>
+        // 简单的交互示例，实际应更复杂
+        const serviceTypeSelect = document.getElementById('service-type');
+        const addressInput = document.getElementById('address');
+        const phoneInput = document.getElementById('phone');
+
+        const previewService = document.getElementById('preview-service');
+        const previewAddress = document.getElementById('preview-address');
+        const previewPhone = document.getElementById('preview-phone');
+
+        serviceTypeSelect.addEventListener('change', function () {
+            previewService.textContent = this.options[this.selectedIndex].text;
+        });
+        // 实际应有更复杂的日历和时间选择逻辑更新 preview-time
+
+        addressInput.addEventListener('input', function () {
+            previewAddress.textContent = this.value || '待填写';
+        });
+
+        phoneInput.addEventListener('input', function () {
+            // 简单格式化和验证示例
+            let phoneNumber = this.value.replace(/\D/g, '');
+            if (phoneNumber.length > 11) {
+                phoneNumber = phoneNumber.substring(0, 11);
+            }
+            this.value = phoneNumber;
+            previewPhone.textContent = phoneNumber.length === 11 ? phoneNumber : '待填写 (11位数字)';
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家政服务产品 - 在线预约</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+        }
+
+        .nav-menu {
+            background-color: #34495e;
+            padding: 10px 0;
+        }
+
+        .nav-menu ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        .nav-menu li {
+            display: inline-block;
+            margin: 0 15px;
+        }
+
+        .nav-menu a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        .hero-section {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://via.placeholder.com/1200x400');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+            padding: 80px 20px;
+            margin-bottom: 30px;
+        }
+
+        .hero-section h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+        }
+
+        .hero-section p {
+            font-size: 1.2em;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+
+        .cta-button:hover {
+            background-color: #2980b9;
+        }
+
+        .service-categories {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 40px;
+        }
+
+        .service-card {
+            width: 30%;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            overflow: hidden;
+            transition: transform 0.3s;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .service-card img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .service-card-content {
+            padding: 20px;
+        }
+
+        .service-card h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        .service-card p {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .service-card .price {
+            font-weight: bold;
+            color: #e74c3c;
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+
+        .service-card .book-now {
+            display: inline-block;
+            background-color: #2ecc71;
+            color: white;
+            padding: 8px 15px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .booking-process {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .booking-process h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .process-steps {
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .process-step {
+            width: 22%;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 50px;
+            height: 50px;
+            background-color: #3498db;
+            color: white;
+            border-radius: 50%;
+            line-height: 50px;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .process-step h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+
+        .testimonials {
+            margin-bottom: 40px;
+        }
+
+        .testimonials h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .testimonial-cards {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .testimonial-card {
+            width: 30%;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .testimonial-card p {
+            font-style: italic;
+            color: #7f8c8d;
+            margin-bottom: 15px;
+        }
+
+        .testimonial-card .customer {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .booking-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 40px;
+        }
+
+        .booking-form h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #2c3e50;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .form-group textarea {
+            height: 100px;
+        }
+
+        .form-submit {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            width: 100%;
+        }
+
+        .form-submit:hover {
+            background-color: #2980b9;
+        }
+
+        footer {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px 0;
+            margin-top: 40px;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .service-card {
+                width: 48%;
+            }
+
+            .process-steps {
+                flex-wrap: wrap;
+            }
+
+            .process-step {
+                width: 48%;
+                margin-bottom: 20px;
+            }
+
+            .testimonial-cards {
+                flex-direction: column;
+            }
+
+            .testimonial-card {
+                width: 100%;
+                margin-bottom: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .service-card {
+                width: 100%;
+            }
+
+            .process-step {
+                width: 100%;
+            }
+        }
+
+        /* 师傅接单弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .close-button {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-button:hover {
+            color: black;
+        }
+
+        .order-details {
+            margin-bottom: 20px;
+        }
+
+        .order-details p {
+            margin: 5px 0;
+        }
+
+        .bid-form {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="container">
+            <h1>家政无忧</h1>
+            <p>专业的家政服务平台 - 让生活更轻松</p>
+        </div>
+    </header>
+
+    <div class="nav-menu">
+        <div class="container">
+            <ul>
+                <li><a href="#">首页</a></li>
+                <li><a href="#services">服务项目</a></li>
+                <li><a href="#booking">在线预约</a></li>
+                <li><a href="#">师傅入驻</a></li>
+                <li><a href="#">商家合作</a></li>
+                <li><a href="#">我的订单</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="hero-section">
+            <h1>专业家政服务，一键预约</h1>
+            <p>提供保洁、维修、月嫂等全方位家政服务，3000+认证师傅，100%准时上门</p>
+            <a href="#booking" class="cta-button">立即预约</a>
+        </div>
+
+        <div id="services" class="service-categories">
+            <div class="service-card">
+                <img src="https://via.placeholder.com/400x200" alt="日常保洁">
+                <div class="service-card-content">
+                    <h3>日常保洁</h3>
+                    <p>专业保洁师傅，全屋深度清洁，让您的家焕然一新</p>
+                    <div class="price">¥ 30/小时起</div>
+                    <a href="#booking" class="book-now" onclick="selectService('日常保洁')">立即预约</a>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <img src="https://via.placeholder.com/400x200" alt="家电维修">
+                <div class="service-card-content">
+                    <h3>家电维修</h3>
+                    <p>专业维修各类家电，快速上门，修复率高达98%</p>
+                    <div class="price">¥ 80/次起</div>
+                    <a href="#booking" class="book-now" onclick="selectService('家电维修')">立即预约</a>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <img src="https://via.placeholder.com/400x200" alt="专业月嫂">
+                <div class="service-card-content">
+                    <h3>专业月嫂</h3>
+                    <p>持证上岗，专业护理新生儿和产妇，提供全方位月子服务</p>
+                    <div class="price">¥ 15000/月起</div>
+                    <a href="#booking" class="book-now" onclick="selectService('专业月嫂')">立即预约</a>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <img src="https://via.placeholder.com/400x200" alt="管道疏通">
+                <div class="service-card-content">
+                    <h3>管道疏通</h3>
+                    <p>专业设备，快速解决各类管道堵塞问题</p>
+                    <div class="price">¥ 100/次起</div>
+                    <a href="#booking" class="book-now" onclick="selectService('管道疏通')">立即预约</a>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <img src="https://via.placeholder.com/400x200" alt="搬家服务">
+                <div class="service-card-content">
+                    <h3>搬家服务</h3>
+                    <p>专业团队，提供打包、搬运、安装一条龙服务</p>
+                    <div class="price">¥ 200/次起</div>
+                    <a href="#booking" class="book-now" onclick="selectService('搬家服务')">立即预约</a>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <img src="https://via.placeholder.com/400x200" alt="家具安装">
+                <div class="service-card-content">
+                    <h3>家具安装</h3>
+                    <p>专业师傅上门安装各类家具，服务细致，安装牢固</p>
+                    <div class="price">¥ 120/次起</div>
+                    <a href="#booking" class="book-now" onclick="selectService('家具安装')">立即预约</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="booking-process">
+            <h2>预约流程</h2>
+            <div class="process-steps">
+                <div class="process-step">
+                    <div class="step-number">1</div>
+                    <h3>选择服务</h3>
+                    <p>选择您需要的服务类型和具体项目</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">2</div>
+                    <h3>提交需求</h3>
+                    <p>填写服务时间、地点和具体需求</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">3</div>
+                    <h3>师傅接单</h3>
+                    <p>系统匹配专业师傅，确认订单</p>
+                </div>
+                <div class="process-step">
+                    <div class="step-number">4</div>
+                    <h3>服务完成</h3>
+                    <p>师傅上门服务，完成后评价</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="testimonials">
+            <h2>用户评价</h2>
+            <div class="testimonial-cards">
+                <div class="testimonial-card">
+                    <p>"预约非常方便，师傅很专业，打扫得非常干净，下次还会继续预约！"</p>
+                    <div class="customer">- 张女士，保洁服务</div>
+                </div>
+                <div class="testimonial-card">
+                    <p>"师傅技术很好，冰箱坏了很久，其他地方都修不好，这里的师傅一下就找到问题所在，修好了！"</p>
+                    <div class="customer">- 李先生，家电维修</div>
+                </div>
+                <div class="testimonial-card">
+                    <p>"月嫂阿姨非常专业，对宝宝照顾得很好，也很会做月子餐，让我的月子期过得很舒心。"</p>
+                    <div class="customer">- 王女士，月嫂服务</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="booking" class="booking-form">
+            <h2>在线预约</h2>
+            <form id="service-booking-form">
+                <div class="form-group">
+                    <label for="service-type">服务类型</label>
+                    <select id="service-type" name="service-type" required>
+                        <option value="">请选择服务类型</option>
+                        <option value="日常保洁">日常保洁</option>
+                        <option value="家电维修">家电维修</option>
+                        <option value="专业月嫂">专业月嫂</option>
+                        <option value="管道疏通">管道疏通</option>
+                        <option value="搬家服务">搬家服务</option>
+                        <option value="家具安装">家具安装</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="service-date">服务日期</label>
+                    <input type="date" id="service-date" name="service-date" required min="">
+                </div>
+
+                <div class="form-group">
+                    <label for="service-time">服务时间</label>
+                    <select id="service-time" name="service-time" required>
+                        <option value="">请选择时间段</option>
+                        <option value="08:00-10:00">08:00-10:00</option>
+                        <option value="10:00-12:00">10:00-12:00</option>
+                        <option value="13:00-15:00">13:00-15:00</option>
+                        <option value="15:00-17:00">15:00-17:00</option>
+                        <option value="18:00-20:00">18:00-20:00</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="address">服务地址</label>
+                    <input type="text" id="address" name="address" placeholder="请输入详细地址" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="contact-name">联系人</label>
+                    <input type="text" id="contact-name" name="contact-name" placeholder="请输入联系人姓名" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="contact-phone">联系电话</label>
+                    <input type="tel" id="contact-phone" name="contact-phone" placeholder="请输入联系电话" required
+                        pattern="[0-9]{11}">
+                </div>
+
+                <div class="form-group">
+                    <label for="service-details">服务需求详情</label>
+                    <textarea id="service-details" name="service-details"
+                        placeholder="请详细描述您的服务需求，例如：房屋面积、具体维修物品等"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="price-preference">价格偏好</label>
+                    <select id="price-preference" name="price-preference">
+                        <option value="standard">标准价格</option>
+                        <option value="bidding">竞价模式（多位师傅报价）</option>
+                    </select>
+                </div>
+
+                <button type="button" class="form-submit" onclick="submitBooking()">提交预约</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 师傅接单弹窗 -->
+    <div id="worker-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeWorkerModal()">&times;</span>
+            <h2>订单详情</h2>
+            <div class="order-details">
+                <p><strong>服务类型：</strong><span id="modal-service-type"></span></p>
+                <p><strong>服务时间：</strong><span id="modal-service-time"></span></p>
+                <p><strong>服务地址：</strong><span id="modal-address"></span></p>
+                <p><strong>客户需求：</strong><span id="modal-requirements"></span></p>
+            </div>
+            <div class="bid-form">
+                <h3>接单确认</h3>
+                <div class="form-group">
+                    <label for="bid-price">您的报价</label>
+                    <input type="number" id="bid-price" name="bid-price" placeholder="请输入您的报价（元）">
+                </div>
+                <div class="form-group">
+                    <label for="arrival-time">预计到达时间</label>
+                    <select id="arrival-time" name="arrival-time">
+                        <option value="准时">准时到达</option>
+                        <option value="提前15分钟">提前15分钟</option>
+                        <option value="可能晚5-10分钟">可能晚5-10分钟</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="worker-note">给客户留言</label>
+                    <textarea id="worker-note" name="worker-note" placeholder="可以向客户介绍您的专业能力或询问更多细节"></textarea>
+                </div>
+                <button type="button" class="form-submit" onclick="acceptOrder()">确认接单</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2023 家政无忧 版权所有 | 客服热线：400-123-4567</p>
+        </div>
+    </footer>
+
+    <script>
+        // 设置日期最小值为今天
+        document.addEventListener('DOMContentLoaded', function () {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('service-date').min = today;
+        });
+
+        // 选择服务
+        function selectService(service) {
+            const serviceSelect = document.getElementById('service-type');
+            for (let i = 0; i < serviceSelect.options.length; i++) {
+                if (serviceSelect.options[i].value === service) {
+                    serviceSelect.selectedIndex = i;
+                    break;
+                }
+            }
+            // 滚动到预约表单
+            document.getElementById('booking').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // 提交预约
+        function submitBooking() {
+            const form = document.getElementById('service-booking-form');
+            const serviceType = document.getElementById('service-type').value;
+            const serviceDate = document.getElementById('service-date').value;
+            const serviceTime = document.getElementById('service-time').value;
+            const address = document.getElementById('address').value;
+            const contactName = document.getElementById('contact-name').value;
+            const contactPhone = document.getElementById('contact-phone').value;
+            const serviceDetails = document.getElementById('service-details').value;
+
+            // 表单验证
+            if (!serviceType || !serviceDate || !serviceTime || !address || !contactName || !contactPhone) {
+                alert('请填写所有必填字段');
+                return;
+            }
+
+            // 手机号验证
+            const phoneRegex = /^[0-9]{11}$/;
+            if (!phoneRegex.test(contactPhone)) {
+                alert('请输入正确的11位手机号码');
+                return;
+            }
+
+            // 模拟提交成功，显示师傅接单界面（实际应用中这里会有API调用）
+            alert('预约提交成功！系统正在为您匹配专业师傅，请稍候...');
+
+            // 模拟师傅接单界面
+            setTimeout(() => {
+                // 在实际应用中，这里应该是从后端获取匹配的师傅信息
+                showWorkerModal(serviceType, serviceDate + ' ' + serviceTime, address, serviceDetails);
+            }, 2000);
+        }
+
+        // 显示师傅接单弹窗
+        function showWorkerModal(serviceType, serviceTime, address, requirements) {
+            document.getElementById('modal-service-type').textContent = serviceType;
+            document.getElementById('modal-service-time').textContent = serviceTime;
+            document.getElementById('modal-address').textContent = address;
+            document.getElementById('modal-requirements').textContent = requirements || '无特殊要求';
+
+            document.getElementById('worker-modal').style.display = 'block';
+        }
+
+        // 关闭师傅接单弹窗
+        function closeWorkerModal() {
+            document.getElementById('worker-modal').style.display = 'none';
+        }
+
+        // 师傅接单
+        function acceptOrder() {
+            const bidPrice = document.getElementById('bid-price').value;
+            const arrivalTime = document.getElementById('arrival-time').value;
+            const workerNote = document.getElementById('worker-note').value;
+
+            if (!bidPrice) {
+                alert('请输入您的报价');
+                return;
+            }
+
+            // 模拟接单成功
+            alert('接单成功！订单详情已发送到您的手机上，请按时上门服务。');
+            closeWorkerModal();
+
+            // 实际应用中这里会有API调用，将接单信息提交到后端
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户端 - 订单管理</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .order-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+
+        .order-item h2 {
+            margin-top: 0;
+            font-size: 1.2em;
+            color: #007bff;
+        }
+
+        .order-status {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .status-pending {
+            color: orange;
+        }
+
+        .status-confirmed {
+            color: blue;
+        }
+
+        .status-progress {
+            color: purple;
+        }
+
+        .status-completed {
+            color: green;
+        }
+
+        .status-cancelled {
+            color: red;
+        }
+
+        .status-failed {
+            color: darkred;
+        }
+
+        .actions button {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+
+        .actions button.cancel {
+            background-color: #dc3545;
+        }
+
+        .actions button.modify {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .actions button:hover {
+            opacity: 0.8;
+        }
+
+        .important-note {
+            color: #dc3545;
+            font-size: 0.9em;
+            margin-top: 10px;
+            border: 1px dashed #dc3545;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>我的订单</h1>
+
+        <div class="order-item">
+            <h2>订单号: #12345 - 保洁服务</h2>
+            <p class="order-status status-confirmed">状态: 已确认 (待服务)</p>
+            <p><strong>服务时间:</strong> 2023-10-28 14:00</p>
+            <p><strong>服务地址:</strong> XX市XX区XX街道XX号</p>
+            <p><strong>师傅:</strong> 张三</p>
+            <div class="actions">
+                <button type="button" class="cancel" onclick="requestCancelOrder('12345')">取消订单</button>
+                <button type="button" class="modify" onclick="requestModifyOrderTime('12345')">修改时间</button>
+            </div>
+            <div class="important-note" style="display:none;" id="note-12345">
+                <strong>重要提示:</strong> 若师傅未在规定时间内响应您的取消/改时请求或明确拒绝，订单可能进入“报废”状态。平台将介入处理，请留意后续通知。
+            </div>
+        </div>
+
+        <div class="order-item">
+            <h2>订单号: #67890 - 月嫂服务</h2>
+            <p class="order-status status-progress">状态: 进行中</p>
+            <p><strong>服务时间:</strong> 2023-10-27 开始</p>
+            <p><strong>服务地址:</strong> YY市YY区YY路YY小区</p>
+            <p><strong>师傅:</strong> 李四</p>
+            <div class="actions">
+                <!-- 进行中订单通常不允许用户直接取消/修改 -->
+            </div>
+        </div>
+
+        <div class="order-item">
+            <h2>订单号: #11223 - 维修服务</h2>
+            <p class="order-status status-completed">状态: 已完成</p>
+            <p><strong>服务时间:</strong> 2023-10-26 10:00</p>
+            <p><strong>服务地址:</strong> ZZ市ZZ区ZZ大厦</p>
+            <p><strong>师傅:</strong> 王五</p>
+            <div class="actions">
+                <button type="button">评价服务</button>
+            </div>
+        </div>
+
+        <div class="order-item">
+            <h2>订单号: #33445 - 保洁服务</h2>
+            <p class="order-status status-cancelled">状态: 已取消</p>
+            <p><strong>原定服务时间:</strong> 2023-10-29 09:00</p>
+            <p><strong>取消原因:</strong> 用户发起，师傅同意。</p>
+        </div>
+
+        <div class="order-item">
+            <h2>订单号: #55667 - 维修服务</h2>
+            <p class="order-status status-failed">状态: 报废 (待协调)</p>
+            <p><strong>服务时间:</strong> 2023-10-30 15:00</p>
+            <p><strong>详情:</strong> 用户申请修改时间，师傅超时未响应。</p>
+            <div class="important-note">
+                <strong>重要提示:</strong> 此订单已进入“报废”状态，平台管理员将介入协调。请关注协调群聊或平台通知。
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function requestCancelOrder(orderId) {
+            // 实际应用中会调用API
+            console.log(`用户请求取消订单: ${orderId}`);
+            alert(`您已发起取消订单 ${orderId} 的请求。请等待师傅确认。`);
+            // 显示重要提示
+            const note = document.getElementById(`note-${orderId}`);
+            if (note) note.style.display = 'block';
+            // 模拟师傅响应超时或拒绝的情况，可以更新UI
+        }
+
+        function requestModifyOrderTime(orderId) {
+            // 实际应用中会调用API并弹出时间选择器
+            console.log(`用户请求修改订单时间: ${orderId}`);
+            const newTime = prompt(`请输入订单 ${orderId} 的新服务时间 (例如 YYYY-MM-DD HH:MM):`);
+            if (newTime) {
+                alert(`您已发起修改订单 ${orderId} 时间为 ${newTime} 的请求。请等待师傅确认。`);
+                // 显示重要提示
+                const note = document.getElementById(`note-${orderId}`);
+                if (note) note.style.display = 'block';
+            } else {
+                alert('修改时间操作已取消。');
+            }
+            // 模拟师傅响应超时或拒绝的情况，可以更新UI
+        }
+    </script>
+</body>
+
+</html>

@@ -922,14 +922,11 @@
 
         // 获取生成参数 - 始终使用最精确模式
         function getGenerateParams() {
-            // 获取复选框选中的前缀
-            const noneChecked = document.getElementById('prefix-none').checked;
-            let excludePrefixes = [];
-
-            if (!noneChecked) {
-                const prefixCheckboxes = document.querySelectorAll('.prefix-checkbox:checked');
-                excludePrefixes = Array.from(prefixCheckboxes).map(checkbox => checkbox.value);
-            }
+            // 获取多选的排除前缀
+            const selectedOptions = Array.from(elements.prefix.selectedOptions);
+            const excludePrefixes = selectedOptions
+                .map(option => option.value)
+                .filter(value => value && value !== 'none');
 
             return {
                 count: parseInt(elements.count.value, 10) || 10,
@@ -1704,30 +1701,6 @@
             btn.style.zIndex = 9999;
             btn.onclick = clearKeyAuth;
             document.body.appendChild(btn);
-        });
-
-        // 复选框交互逻辑
-        document.addEventListener('DOMContentLoaded', function () {
-            const noneCheckbox = document.getElementById('prefix-none');
-            const prefixCheckboxes = document.querySelectorAll('.prefix-checkbox');
-
-            // 当选择"不排除任何前缀"时，取消其他选项
-            noneCheckbox.addEventListener('change', function () {
-                if (this.checked) {
-                    prefixCheckboxes.forEach(checkbox => {
-                        checkbox.checked = false;
-                    });
-                }
-            });
-
-            // 当选择任何前缀时，取消"不排除任何前缀"
-            prefixCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function () {
-                    if (this.checked) {
-                        noneCheckbox.checked = false;
-                    }
-                });
-            });
         });
     </script>
 </body>

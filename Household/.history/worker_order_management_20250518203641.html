@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>师傅端 - 订单接收与管理</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1,
+        h2 {
+            color: #333;
+        }
+
+        .tabs {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .tabs button {
+            padding: 10px 15px;
+            margin-right: 5px;
+            border: 1px solid #ddd;
+            border-bottom: none;
+            background-color: #f9f9f9;
+            cursor: pointer;
+            border-radius: 4px 4px 0 0;
+        }
+
+        .tabs button.active {
+            background-color: #fff;
+            border-bottom: 1px solid #fff;
+        }
+
+        .order-list {
+            /* Styles for the list of orders */
+        }
+
+        .order-item {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+
+        .order-item h3 {
+            margin-top: 0;
+            font-size: 1.1em;
+            color: #007bff;
+        }
+
+        .order-details p {
+            margin: 5px 0;
+        }
+
+        .actions button {
+            background-color: #28a745;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            margin-top: 10px;
+        }
+
+        .actions button.reject {
+            background-color: #dc3545;
+        }
+
+        .actions button.confirm-cancel,
+        .actions button.confirm-modify {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .actions button:hover {
+            opacity: 0.8;
+        }
+
+        .bidding-info {
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+
+        .status-update select {
+            padding: 8px;
+            margin-top: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>订单接收与管理</h1>
+
+        <div class="tabs">
+            <button class="active" onclick="showTab('newOrders')">新订单 (智能派单/抢单池)</button>
+            <button onclick="showTab('activeOrders')">进行中订单</button>
+            <button onclick="showTab('historyOrders')">历史订单</button>
+        </div>
+
+        <div id="newOrders" class="order-list">
+            <h2>新订单</h2>
+            <div class="order-item">
+                <h3>订单 #001 - 保洁服务 (智能派单)</h3>
+                <div class="order-details">
+                    <p><strong>服务内容:</strong> 日常保洁三小时</p>
+                    <p><strong>时间:</strong> 2023-11-01 10:00 - 13:00</p>
+                    <p><strong>地点:</strong> XX市XX区XX路123号</p>
+                    <p><strong>用户要求:</strong> 请自带清洁工具。</p>
+                    <p><strong>报价:</strong> ¥150 (平台推荐价)</p>
+                </div>
+                <div class="actions">
+                    <button type="button" onclick="acceptOrder('001')">接受订单</button>
+                    <button type="button" class="reject" onclick="rejectOrder('001')">拒绝订单</button>
+                </div>
+            </div>
+
+            <div class="order-item">
+                <h3>订单 #002 - 维修服务 (抢单池)</h3>
+                <div class="order-details">
+                    <p><strong>服务内容:</strong> 更换水龙头</p>
+                    <p><strong>时间:</strong> 2023-11-01 下午</p>
+                    <p><strong>地点:</strong> YY市YY区YY大厦A座501</p>
+                    <p><strong>用户要求:</strong> 尽快处理。</p>
+                    <p class="bidding-info"><strong>当前竞价排名:</strong> 第 3 名 (您的报价: ¥80, 最低报价: ¥70)</p>
+                </div>
+                <div class="actions">
+                    <label for="bid-price-002">我的报价 (±20%):</label>
+                    <input type="number" id="bid-price-002" value="80" min="64" max="96"
+                        style="padding: 8px; width: 80px; margin-right:10px;">
+                    <button type="button" onclick="submitBid('002')">提交报价</button>
+                </div>
+            </div>
+
+            <div class="order-item">
+                <h3>用户请求：订单 #101 取消</h3>
+                <div class="order-details">
+                    <p><strong>订单号:</strong> #101 - 保洁服务</p>
+                    <p><strong>原定时间:</strong> 2023-11-02 09:00</p>
+                    <p><strong>用户取消原因:</strong> 行程有变</p>
+                </div>
+                <div class="actions">
+                    <button type="button" class="confirm-cancel"
+                        onclick="handleUserRequest('101', 'cancel', 'confirm')">同意取消</button>
+                    <button type="button" class="reject"
+                        onclick="handleUserRequest('101', 'cancel', 'reject')">拒绝取消</button>
+                </div>
+            </div>
+
+            <div class="order-item">
+                <h3>用户请求：订单 #102 修改时间</h3>
+                <div class="order-details">
+                    <p><strong>订单号:</strong> #102 - 月嫂服务</p>
+                    <p><strong>原定时间:</strong> 2023-11-03 14:00</p>
+                    <p><strong>用户期望新时间:</strong> 2023-11-04 10:00</p>
+                </div>
+                <div class="actions">
+                    <button type="button" class="confirm-modify"
+                        onclick="handleUserRequest('102', 'modify', 'confirm')">同意修改</button>
+                    <button type="button" class="reject"
+                        onclick="handleUserRequest('102', 'modify', 'reject')">拒绝修改</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="activeOrders" class="order-list" style="display:none;">
+            <h2>进行中订单</h2>
+            <div class="order-item">
+                <h3>订单 #003 - 保洁服务</h3>
+                <div class="order-details">
+                    <p><strong>服务内容:</strong> 深度清洁</p>
+                    <p><strong>时间:</strong> 2023-10-30 09:00 (进行中)</p>
+                    <p><strong>地点:</strong> ZZ市ZZ区幸福小区1栋101</p>
+                </div>
+                <div class="status-update">
+                    <label for="status-003">更新服务状态:</label>
+                    <select id="status-003" onchange="updateOrderStatus('003', this.value)">
+                        <option value="progressing">服务中</option>
+                        <option value="departed">已出发</option>
+                        <option value="completed">已完成</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div id="historyOrders" class="order-list" style="display:none;">
+            <h2>历史订单</h2>
+            <!-- 历史订单列表 -->
+            <div class="order-item">
+                <h3>订单 #004 - 维修 (已完成)</h3>
+                <p><strong>完成时间:</strong> 2023-10-25</p>
+            </div>
+            <div class="order-item">
+                <h3>订单 #005 - 保洁 (用户取消-已同意)</h3>
+                <p><strong>取消时间:</strong> 2023-10-24</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            const lists = document.querySelectorAll('.order-list');
+            lists.forEach(list => list.style.display = 'none');
+            document.getElementById(tabName).style.display = 'block';
+
+            const buttons = document.querySelectorAll('.tabs button');
+            buttons.forEach(button => button.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+        }
+
+        function acceptOrder(orderId) {
+            alert(`订单 ${orderId} 已接受！`);
+            // API call to accept order
+        }
+
+        function rejectOrder(orderId) {
+            const reason = prompt(`请输入拒绝订单 ${orderId} 的原因:`);
+            if (reason) {
+                alert(`订单 ${orderId} 已拒绝，原因: ${reason}`);
+                // API call to reject order
+            }
+        }
+
+        function submitBid(orderId) {
+            const price = document.getElementById(`bid-price-${orderId}`).value;
+            alert(`订单 ${orderId} 已提交报价: ¥${price}`);
+            // API call to submit bid
+        }
+
+        function handleUserRequest(orderId, requestType, action) {
+            const typeText = requestType === 'cancel' ? '取消' : '修改时间';
+            const actionText = action === 'confirm' ? '同意' : '拒绝';
+            if (action === 'reject') {
+                const reason = prompt(`请输入拒绝用户${typeText}请求的原因 (订单 ${orderId}):`);
+                if (reason === null) return; // User cancelled prompt
+                alert(`已${actionText}用户对订单 ${orderId} 的${typeText}请求。原因: ${reason}`);
+            } else {
+                alert(`已${actionText}用户对订单 ${orderId} 的${typeText}请求。`);
+            }
+            // API call to handle user request
+        }
+
+        function updateOrderStatus(orderId, newStatus) {
+            alert(`订单 ${orderId} 状态已更新为: ${newStatus}`);
+            // API call to update status
+        }
+
+        // Initialize with the first tab active
+        document.addEventListener('DOMContentLoaded', () => {
+            showTab('newOrders');
+        });
+    </script>
+</body>
+
+</html>

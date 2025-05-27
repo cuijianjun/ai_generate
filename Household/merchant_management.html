@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商家端 - 管理后台</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 220px;
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .sidebar h2 {
+            margin-top: 0;
+            font-size: 1.5em;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            display: block;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar ul li a:hover,
+        .sidebar ul li a.active {
+            background-color: #555;
+        }
+
+        .content {
+            flex-grow: 1;
+            padding: 20px;
+            background-color: #fff;
+            margin: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1,
+        h3 {
+            color: #333;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        .actions button,
+        .form-group button {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 5px;
+        }
+
+        .actions button.edit {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .actions button.delete {
+            background-color: #dc3545;
+        }
+
+        .actions button:hover {
+            opacity: 0.8;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group select,
+        .form-group textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .stat-card {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .stat-card h4 {
+            margin-top: 0;
+            color: #007bff;
+        }
+
+        .stat-card p {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidebar">
+        <h2>商家后台</h2>
+        <ul>
+            <li><a href="#dashboard" class="active" onclick="showSection('dashboard')">仪表盘 (数据统计)</a></li>
+            <li><a href="#services" onclick="showSection('services')">服务管理</a></li>
+            <li><a href="#workers" onclick="showSection('workers')">师傅管理</a></li>
+            <li><a href="#orders" onclick="showSection('orders')">订单管理</a></li>
+            <li><a href="#finance" onclick="showSection('finance')">财务管理</a></li>
+            <li><a href="#profile" onclick="showSection('profile')">商家信息</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <div id="dashboard" class="section">
+            <h1>仪表盘 - 数据统计</h1>
+            <h3>今日订单统计</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>成功下单</h4>
+                    <p>15</p>
+                </div>
+                <div class="stat-card">
+                    <h4>用户取消 (师傅同意)</h4>
+                    <p>2</p>
+                </div>
+                <div class="stat-card">
+                    <h4>用户取消 (报废)</h4>
+                    <p>1</p>
+                </div>
+                <div class="stat-card">
+                    <h4>用户改时 (师傅同意)</h4>
+                    <p>3</p>
+                </div>
+                <div class="stat-card">
+                    <h4>用户改时 (未成功)</h4>
+                    <p>0</p>
+                </div>
+            </div>
+            <h3 style="margin-top:30px;">收入统计 (今日)</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h4>总收入</h4>
+                    <p>¥1250.00</p>
+                </div>
+            </div>
+            <!-- 更多历史数据查询表单和图表区域 -->
+        </div>
+
+        <div id="services" class="section" style="display:none;">
+            <h1>服务管理</h1>
+            <div class="form-group">
+                <button type="button">新增服务项目</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>服务名称</th>
+                        <th>价格</th>
+                        <th>服务范围</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>日常保洁</td>
+                        <td>¥50/小时</td>
+                        <td>全市</td>
+                        <td>上架中</td>
+                        <td class="actions">
+                            <button class="edit">编辑</button>
+                            <button class="delete">下架</button>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>深度油烟机清洗</td>
+                        <td>¥200/次</td>
+                        <td>XX区, YY区</td>
+                        <td>已下架</td>
+                        <td class="actions">
+                            <button class="edit">编辑</button>
+                            <button>上架</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="workers" class="section" style="display:none;">
+            <h1>师傅管理</h1>
+            <div class="form-group">
+                <button type="button">邀请/添加师傅</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>师傅姓名</th>
+                        <th>联系电话</th>
+                        <th>状态</th>
+                        <th>今日接单</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>张三</td>
+                        <td>138****1234</td>
+                        <td>空闲</td>
+                        <td>2</td>
+                        <td class="actions"><button>查看详情</button> <button>分配订单</button></td>
+                    </tr>
+                    <tr>
+                        <td>李四</td>
+                        <td>139****5678</td>
+                        <td>服务中</td>
+                        <td>1</td>
+                        <td class="actions"><button>查看详情</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="orders" class="section" style="display:none;">
+            <h1>订单管理</h1>
+            <!-- 筛选条件 -->
+            <table>
+                <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>用户</th>
+                        <th>服务类型</th>
+                        <th>时间</th>
+                        <th>状态</th>
+                        <th>指派师傅</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>#1001</td>
+                        <td>王女士</td>
+                        <td>保洁</td>
+                        <td>2023-11-05 14:00</td>
+                        <td>待确认</td>
+                        <td>未指派</td>
+                        <td class="actions"><button onclick="confirmOrder('1001')">确认订单</button> <button class="edit"
+                                onclick="assignWorker('1001')">指派师傅</button></td>
+                    </tr>
+                    <tr>
+                        <td>#1002</td>
+                        <td>李先生</td>
+                        <td>维修</td>
+                        <td>2023-11-06 10:00</td>
+                        <td>已确认</td>
+                        <td>张三</td>
+                        <td class="actions"><button>查看详情</button></td>
+                    </tr>
+                    <tr>
+                        <td>#1003</td>
+                        <td>赵小姐</td>
+                        <td>月嫂</td>
+                        <td>2023-11-07 (长期)</td>
+                        <td>进行中</td>
+                        <td>王师傅</td>
+                        <td class="actions"><button>查看详情</button></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="finance" class="section" style="display:none;">
+            <h1>财务管理</h1>
+            <p><strong>可提现金额:</strong> ¥5000.00</p>
+            <div class="form-group">
+                <button type="button">申请提现</button>
+            </div>
+            <h3>结算记录</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>日期</th>
+                        <th>金额</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2023-10-20</td>
+                        <td>¥2000.00</td>
+                        <td>已结算</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="profile" class="section" style="display:none;">
+            <h1>商家信息</h1>
+            <p>此处展示和编辑商家资质信息、联系方式等。</p>
+            <!-- 表单编辑商家信息 -->
+        </div>
+
+    </div>
+
+    <script>
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.content .section');
+            sections.forEach(section => section.style.display = 'none');
+            document.getElementById(sectionId).style.display = 'block';
+
+            const links = document.querySelectorAll('.sidebar ul li a');
+            links.forEach(link => link.classList.remove('active'));
+            document.querySelector(`.sidebar ul li a[href="#${sectionId}"]`).classList.add('active');
+        }
+
+        function confirmOrder(orderId) {
+            alert(`订单 ${orderId} 已确认。请及时指派师傅。`);
+            // API call
+        }
+
+        function assignWorker(orderId) {
+            const workerName = prompt(`为订单 ${orderId} 指派师傅 (输入师傅名称):`);
+            if (workerName) {
+                alert(`订单 ${orderId} 已指派给师傅: ${workerName}`);
+                // API call
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection('dashboard');
+        });
+    </script>
+</body>
+
+</html>

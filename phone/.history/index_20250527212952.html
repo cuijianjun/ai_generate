@@ -1705,30 +1705,6 @@
             btn.onclick = clearKeyAuth;
             document.body.appendChild(btn);
         });
-
-        // 复选框交互逻辑
-        document.addEventListener('DOMContentLoaded', function () {
-            const noneCheckbox = document.getElementById('prefix-none');
-            const prefixCheckboxes = document.querySelectorAll('.prefix-checkbox');
-
-            // 当选择"不排除任何前缀"时，取消其他选项
-            noneCheckbox.addEventListener('change', function () {
-                if (this.checked) {
-                    prefixCheckboxes.forEach(checkbox => {
-                        checkbox.checked = false;
-                    });
-                }
-            });
-
-            // 当选择任何前缀时，取消"不排除任何前缀"
-            prefixCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', function () {
-                    if (this.checked) {
-                        noneCheckbox.checked = false;
-                    }
-                });
-            });
-        });
     </script>
 </body>
 
